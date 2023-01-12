@@ -3,8 +3,8 @@ package com.example.newchatapp
 import android.provider.ContactsContract
 
 data class User(
-    val userId:String,
-    var userFirstName:String,
-    var userLastName:String,
-    var userEmail: String,
+    val userId:String?=null,
+    var userFirstName:String?=null,
+    var userLastName:String?=null,
+    var userEmail: String?=null,
 )

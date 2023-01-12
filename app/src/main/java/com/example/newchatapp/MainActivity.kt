@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.newchatapp.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private var binding:ActivityMainBinding? = null
     private lateinit var userDatabase:DatabaseReference
+    private var lastID:String?=null
     private lateinit var firebaseDatabase: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,10 +33,30 @@ class MainActivity : AppCompatActivity() {
 
                 val user = User(id!!,name,lastName,email)
 
-                userDatabase.push().setValue(user)
+                lastID  = id
+
+                CoroutineScope(Dispatchers.IO).launch{
+                    userDatabase.push().setValue(user)
+                }
                 Snackbar.make(it, "User saved", Snackbar.LENGTH_SHORT).show()
             }
         }
+
+        val valueEventListener = object:ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot) {
+                for(data in p0.children){
+                    val user = data.getValue(User::class.java)
+                    if(user?.userId == lastID)
+                        binding?.userInfo?.text = user?.toString()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        }
+
+        userDatabase.addValueEventListener(valueEventListener)
     }
 
     override fun onDestroy() {
