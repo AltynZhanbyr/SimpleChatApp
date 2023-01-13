@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import com.example.newchatapp.AppKeys
 import com.example.newchatapp.R
 import com.example.newchatapp.databinding.FragmentLoginBinding
+import com.example.newchatapp.model.User
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -37,8 +40,40 @@ class LoginFragment : Fragment() {
 
         auth = Firebase.auth
         if(auth!=null){
-
+            val user = auth.currentUser
+            Snackbar.make(binding?.root?.rootView!!, user?.email.toString(), Snackbar.LENGTH_SHORT).show()
+            auth.signOut()
         }
+
+        binding?.signInButton?.setOnClickListener {button->
+            val email = binding?.userEmail?.text.toString()
+            val password = binding?.userPassword?.text.toString()
+            auth.signInWithEmailAndPassword(email,password)
+                .addOnCompleteListener(requireActivity()){
+                    if(it.isSuccessful)
+                        Snackbar.make(button,"Signed successfully", Snackbar.LENGTH_SHORT).show()
+                    else
+                        Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
+                }
+        }
+        binding?.signUnButton?.setOnClickListener { button->
+            val email = binding?.userEmail?.text.toString()
+            val password = binding?.userPassword?.text.toString()
+            auth.createUserWithEmailAndPassword(email,password)
+                .addOnCompleteListener(requireActivity()){
+                    if(it.isSuccessful){
+                        val user = auth.currentUser
+                        createUser(user!!)
+                        Snackbar.make(button,"Registration is successfully", Snackbar.LENGTH_SHORT).show()
+                    }else
+                        Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun createUser(user:FirebaseUser){
+        val newUser = User(user.uid,"Test1","Test1",user.email)
+        userDatabase.push().setValue(newUser)
     }
 
     override fun onDestroy() {
