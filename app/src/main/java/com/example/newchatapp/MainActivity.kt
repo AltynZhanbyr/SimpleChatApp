@@ -3,6 +3,7 @@ package com.example.newchatapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.newchatapp.databinding.ActivityMainBinding
+import com.example.newchatapp.model.User
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import kotlinx.coroutines.CoroutineScope

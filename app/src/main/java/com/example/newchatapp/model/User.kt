@@ -1,4 +1,4 @@
-package com.example.newchatapp
+package com.example.newchatapp.model
 
 import android.provider.ContactsContract
 
