@@ -50,22 +50,28 @@ class RegisterFragment : Fragment() {
             auth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener(requireActivity()){
                     if(it.isSuccessful){
-                        val user = auth.currentUser
-                        createUser(user!!)
+                        createUser(auth)
                         showVerificationText()
-                        auth.signOut()
                     }else
                         Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
                 }
         }
     }
 
-    private fun createUser(user: FirebaseUser){
-        val newUser = User(user.uid,binding?.userFirstName?.text.toString(),binding?.userLastName?.text.toString(),user.email)
+    private fun createUser(auth: FirebaseAuth){
+        val user = auth.currentUser
+        val newUser = User(user?.uid,binding?.userFirstName?.text.toString(),binding?.userLastName?.text.toString(),user?.email)
         userDatabase.push().setValue(newUser)
     }
     private fun showVerificationText(){
-        binding?.registerFormLayout?.visibility = View.GONE
-        binding?.verificationText?.visibility = View.VISIBLE
+        auth.currentUser?.sendEmailVerification()?.addOnCompleteListener(requireActivity()){
+            if(it.isSuccessful){
+                binding?.registerFormLayout?.visibility = View.GONE
+                binding?.verificationText?.visibility = View.VISIBLE
+            }
+            else{
+                Snackbar.make(binding?.root?.rootView!!, "Send email failed",Snackbar.LENGTH_SHORT ).show()
+            }
+        }
     }
 }

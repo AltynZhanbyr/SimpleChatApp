@@ -42,8 +42,9 @@ class LoginFragment : Fragment() {
         auth = Firebase.auth
         if(auth!=null){
             val user = auth.currentUser
-            if(user!=null)
-                Snackbar.make(binding?.root?.rootView!!, user?.email.toString(), Snackbar.LENGTH_SHORT).show()
+            if(user!=null && user.isEmailVerified){
+                Snackbar.make(binding?.root?.rootView!!,user.email + "is verified" ,Snackbar.LENGTH_SHORT).show()
+            }
         }
 
         binding?.signInButton?.setOnClickListener {button->
@@ -51,8 +52,14 @@ class LoginFragment : Fragment() {
             val password = binding?.userPassword?.text.toString()
             auth.signInWithEmailAndPassword(email,password)
                 .addOnCompleteListener(requireActivity()){
-                    if(it.isSuccessful)
-                        Snackbar.make(button,"Signed successfully", Snackbar.LENGTH_SHORT).show()
+                    if(it.isSuccessful) {
+                        if(auth.currentUser?.isEmailVerified!!){
+                            Snackbar.make(button,"User signed up", Snackbar.LENGTH_SHORT).show()
+                        }
+                        else{
+                            Snackbar.make(button,"Please, verify your account", Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
                     else
                         Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
                 }
