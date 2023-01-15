@@ -1,14 +1,15 @@
 package com.example.newchatapp.view
 
+import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.core.view.isVisible
 import com.example.newchatapp.AppKeys
 import com.example.newchatapp.R
-import com.example.newchatapp.databinding.FragmentLoginBinding
+import com.example.newchatapp.databinding.FragmentRegisterBinding
 import com.example.newchatapp.model.User
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -18,11 +19,12 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 
-class LoginFragment : Fragment() {
 
-    private var binding:FragmentLoginBinding?=null
+class RegisterFragment : Fragment() {
 
-    private lateinit var userDatabase:DatabaseReference
+    private var binding:FragmentRegisterBinding? = null
+
+    private lateinit var userDatabase: DatabaseReference
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
 
@@ -30,9 +32,10 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater)
+        binding = FragmentRegisterBinding.inflate(inflater)
+
         firebaseDatabase = FirebaseDatabase.getInstance()
-        userDatabase = firebaseDatabase.getReference(AppKeys.USER_KEY)
+        userDatabase =firebaseDatabase.getReference(AppKeys.USER_KEY)
         return binding?.root
     }
 
@@ -40,31 +43,29 @@ class LoginFragment : Fragment() {
         super.onStart()
 
         auth = Firebase.auth
-        if(auth!=null){
-            val user = auth.currentUser
-            if(user!=null)
-                Snackbar.make(binding?.root?.rootView!!, user?.email.toString(), Snackbar.LENGTH_SHORT).show()
-        }
 
-        binding?.signInButton?.setOnClickListener {button->
+        binding?.saveButton?.setOnClickListener { button->
             val email = binding?.userEmail?.text.toString()
             val password = binding?.userPassword?.text.toString()
-            auth.signInWithEmailAndPassword(email,password)
+            auth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener(requireActivity()){
-                    if(it.isSuccessful)
-                        Snackbar.make(button,"Signed successfully", Snackbar.LENGTH_SHORT).show()
-                    else
+                    if(it.isSuccessful){
+                        val user = auth.currentUser
+                        createUser(user!!)
+                        showVerificationText()
+                        auth.signOut()
+                    }else
                         Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
                 }
         }
-        binding?.signUnButton?.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
-        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        binding = null
+    private fun createUser(user: FirebaseUser){
+        val newUser = User(user.uid,binding?.userFirstName?.text.toString(),binding?.userLastName?.text.toString(),user.email)
+        userDatabase.push().setValue(newUser)
+    }
+    private fun showVerificationText(){
+        binding?.registerFormLayout?.visibility = View.GONE
+        binding?.verificationText?.visibility = View.VISIBLE
     }
 }

@@ -7,4 +7,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="verification_text">Registration was successfully, please verify your account, in your email address</string>
 </resources>
