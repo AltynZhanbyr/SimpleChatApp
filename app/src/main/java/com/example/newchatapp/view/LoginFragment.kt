@@ -54,14 +54,14 @@ class LoginFragment : Fragment() {
                 .addOnCompleteListener(requireActivity()){
                     if(it.isSuccessful) {
                         if(auth.currentUser?.isEmailVerified!!){
-                            Snackbar.make(button,"User signed up", Snackbar.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_loginFragment_to_mainPageFragment)
                         }
                         else{
                             Snackbar.make(button,"Please, verify your account", Snackbar.LENGTH_SHORT).show()
                         }
                     }
                     else
-                        Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(button,"Please enter your email or password correctly", Snackbar.LENGTH_SHORT).show()
                 }
         }
         binding?.signUnButton?.setOnClickListener {

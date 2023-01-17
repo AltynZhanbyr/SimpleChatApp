@@ -16,7 +16,6 @@ class UsersAdapter(private val userList:MutableList<User>):RecyclerView.Adapter<
             binding.apply {
                 this.userName.text = user.userFirstName+" "+user.userLastName
                 this.userStatus.text = "online"
-
             }
         }
     }
