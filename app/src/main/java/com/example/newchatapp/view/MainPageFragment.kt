@@ -24,11 +24,6 @@ class MainPageFragment : Fragment() {
 
     private var binding:FragmentMainPageBinding?= null
     private var adapter:UsersAdapter?=null
-    private lateinit var userDatabase: DatabaseReference
-    private lateinit var firebaseDatabase: FirebaseDatabase
-    private lateinit var auth: FirebaseAuth
-
-    private val userList:MutableList<User> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,11 +36,7 @@ class MainPageFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        userDatabase = firebaseDatabase.getReference(AppKeys.USER_KEY)
-        auth = Firebase.auth
-
-        val viewModelFactory = ViewModelFactory(auth,firebaseDatabase,userDatabase)
+        val viewModelFactory = ViewModelFactory()
         val viewModel = ViewModelProvider(this, viewModelFactory)[UsersViewModel::class.java]
 
         viewModel.users.observe(viewLifecycleOwner){

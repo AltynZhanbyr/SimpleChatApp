@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import com.example.newchatapp.AppKeys
 import com.example.newchatapp.R
 import com.example.newchatapp.databinding.FragmentRegisterBinding
 import com.example.newchatapp.model.User
+import com.example.newchatapp.viewmodel.UsersViewModel
+import com.example.newchatapp.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -34,8 +37,6 @@ class RegisterFragment : Fragment() {
     ): View? {
         binding = FragmentRegisterBinding.inflate(inflater)
 
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        userDatabase =firebaseDatabase.getReference(AppKeys.USER_KEY)
         return binding?.root
     }
 
@@ -44,25 +45,26 @@ class RegisterFragment : Fragment() {
 
         auth = Firebase.auth
 
+        val viewModelFactory = ViewModelFactory()
+        val viewModel = ViewModelProvider(this, viewModelFactory)[UsersViewModel::class.java]
+
         binding?.saveButton?.setOnClickListener { button->
             val email = binding?.userEmail?.text.toString()
             val password = binding?.userPassword?.text.toString()
-            auth.createUserWithEmailAndPassword(email,password)
-                .addOnCompleteListener(requireActivity()){
-                    if(it.isSuccessful){
-                        createUser(auth)
-                        showVerificationText()
-                    }else
-                        Snackbar.make(button,"Error", Snackbar.LENGTH_SHORT).show()
-                }
+            val name = binding?.userFirstName?.text.toString()
+            val lastName = binding?.userLastName?.text.toString()
+
+            viewModel.saveUser(email,password,name,lastName)
+
+        }
+        viewModel.isRegistrationComplete.observe(viewLifecycleOwner){
+            if(it)
+                showVerificationText()
+            else
+                Snackbar.make(binding?.root?.rootView!!, "Registration Failed", Snackbar.LENGTH_SHORT).show()
         }
     }
 
-    private fun createUser(auth: FirebaseAuth){
-        val user = auth.currentUser
-        val newUser = User(user?.uid,binding?.userFirstName?.text.toString(),binding?.userLastName?.text.toString(),user?.email)
-        userDatabase.push().setValue(newUser)
-    }
     private fun showVerificationText(){
         auth.currentUser?.sendEmailVerification()?.addOnCompleteListener(requireActivity()){
             if(it.isSuccessful){

@@ -5,11 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.newchatapp.AppKeys
 import com.example.newchatapp.R
 import com.example.newchatapp.databinding.FragmentLoginBinding
 import com.example.newchatapp.model.User
+import com.example.newchatapp.viewmodel.UsersViewModel
+import com.example.newchatapp.viewmodel.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -39,32 +42,36 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        val viewModelFactory = ViewModelFactory()
+        val viewModel = ViewModelProvider(this, viewModelFactory)[UsersViewModel::class.java]
+
         auth = Firebase.auth
         if(auth!=null){
             val user = auth.currentUser
             if(user!=null && user.isEmailVerified){
-                Snackbar.make(binding?.root?.rootView!!,user.email + "is verified" ,Snackbar.LENGTH_SHORT).show()
+
             }
         }
 
         binding?.signInButton?.setOnClickListener {button->
             val email = binding?.userEmail?.text.toString()
             val password = binding?.userPassword?.text.toString()
-            auth.signInWithEmailAndPassword(email,password)
-                .addOnCompleteListener(requireActivity()){
-                    if(it.isSuccessful) {
-                        if(auth.currentUser?.isEmailVerified!!){
-                            findNavController().navigate(R.id.action_loginFragment_to_mainPageFragment)
-                        }
-                        else{
-                            Snackbar.make(button,"Please, verify your account", Snackbar.LENGTH_SHORT).show()
-                        }
-                    }
-                    else
-                        Snackbar.make(button,"Please enter your email or password correctly", Snackbar.LENGTH_SHORT).show()
-                }
+            viewModel.signIn(email,password)
+
         }
-        binding?.signUnButton?.setOnClickListener {
+
+        viewModel.isSignUpComplete.observe(viewLifecycleOwner){
+            if(it)
+                findNavController().navigate(R.id.action_loginFragment_to_mainPageFragment)
+            else
+                Snackbar.make(binding?.root?.rootView!!, "Enter your email or password correct", Snackbar.LENGTH_SHORT).show()
+        }
+        viewModel.isAccountVerified.observe(viewLifecycleOwner){
+            if(!it)
+                Snackbar.make(binding?.root?.rootView!!,"Please, verify your email address",Snackbar.LENGTH_SHORT).show()
+        }
+
+        binding?.signUpButton?.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
