@@ -49,7 +49,7 @@ class LoginFragment : Fragment() {
         if(auth!=null){
             val user = auth.currentUser
             if(user!=null && user.isEmailVerified){
-
+                findNavController().navigate(R.id.action_loginFragment_to_mainPageFragment)
             }
         }
 

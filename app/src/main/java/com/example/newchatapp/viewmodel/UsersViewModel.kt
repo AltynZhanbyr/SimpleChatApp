@@ -80,4 +80,11 @@ class UsersViewModel:ViewModel() {
         val newUser = User(user?.uid,name,lastName,user?.email)
         databaseReference.push().setValue(newUser)
     }
+
+    fun updateUser(){
+
+    }
+    fun deleteUser(){
+
+    }
 }
