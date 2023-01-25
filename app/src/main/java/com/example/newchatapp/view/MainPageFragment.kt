@@ -23,7 +23,7 @@ import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 
 
-class MainPageFragment : Fragment() {
+class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
 
     private var binding:FragmentMainPageBinding?= null
     private var adapter:UsersAdapter?=null
@@ -43,7 +43,7 @@ class MainPageFragment : Fragment() {
         val viewModel = ViewModelProvider(this, viewModelFactory)[UsersViewModel::class.java]
 
         viewModel.users.observe(viewLifecycleOwner){
-            adapter = UsersAdapter(it)
+            adapter = UsersAdapter(it,this)
             adapter?.notifyDataSetChanged()
             binding?.chatList?.adapter = adapter
         }
@@ -60,5 +60,9 @@ class MainPageFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         binding = null
+    }
+
+    override fun onUserClickListener(position: Int) {
+
     }
 }

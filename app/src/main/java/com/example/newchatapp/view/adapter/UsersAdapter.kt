@@ -8,14 +8,22 @@ import com.example.newchatapp.R
 import com.example.newchatapp.databinding.UserItemBinding
 import com.example.newchatapp.model.User
 
-class UsersAdapter(private val userList:MutableList<User>):RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
+class UsersAdapter(private val userList:MutableList<User>,private val onUserClickListener: OnUserClickListener):RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
+    interface OnUserClickListener{
+        fun onUserClickListener(position: Int)
+    }
+
+
     inner class UserViewHolder(view: View): RecyclerView.ViewHolder(view){
         private val binding:UserItemBinding = UserItemBinding.bind(view)
 
-        fun bind(user:User){
+        fun bind(user:User, position: Int){
             binding.apply {
                 this.userName.text = user.userFirstName+" "+user.userLastName
                 this.userStatus.text = "online"
+            }
+            itemView.setOnClickListener {
+                onUserClickListener.onUserClickListener(position =position )
             }
         }
     }
@@ -27,7 +35,7 @@ class UsersAdapter(private val userList:MutableList<User>):RecyclerView.Adapter<
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = userList[position]
-        holder.bind(user)
+        holder.bind(user, position)
     }
 
     override fun getItemCount(): Int {
