@@ -13,6 +13,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class UsersViewModel:ViewModel() {
     private val firebaseAuth: FirebaseAuth
@@ -56,7 +57,6 @@ class UsersViewModel:ViewModel() {
             if(it.isSuccessful){
                 val user = firebaseAuth.currentUser
                 createUser(user!!,name,lastName)
-                isRegistrationComplete.value = true
             }
             else{
                 isRegistrationComplete.value = false
@@ -69,7 +69,6 @@ class UsersViewModel:ViewModel() {
             if(it.isSuccessful){
                 if(firebaseAuth.currentUser?.isEmailVerified!!) {
                     isSignUpComplete.postValue(true)
-                    isAccountVerified.postValue(true)
                 }
                 else
                     isAccountVerified.postValue(false)
@@ -86,7 +85,12 @@ class UsersViewModel:ViewModel() {
     private fun createUser(user:FirebaseUser, name:String, lastName:String){
         val newUser = User(user?.uid,name,lastName,user?.email)
         viewModelScope.launch(Dispatchers.IO) {
-            databaseReference.child(newUser.userId.toString()).setValue(newUser).await()
+            databaseReference.child(newUser.userId.toString()).setValue(newUser).addOnCompleteListener {
+                if(it.isSuccessful)
+                    isRegistrationComplete.postValue(true)
+                else
+                    isRegistrationComplete.postValue(false)
+            }
         }
     }
 }

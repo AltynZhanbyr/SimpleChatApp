@@ -27,8 +27,6 @@ class RegisterFragment : Fragment() {
 
     private var binding:FragmentRegisterBinding? = null
 
-    private lateinit var userDatabase: DatabaseReference
-    private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(

@@ -8,9 +8,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
 class ViewModelFactory(
-//    private val firebaseAuth: FirebaseAuth,
-//    private val firebaseDatabase: FirebaseDatabase,
-//    private val databaseReference: DatabaseReference
 ):ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(UsersViewModel::class.java))

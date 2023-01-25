@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.navigation.fragment.findNavController
 import com.example.newchatapp.AppKeys
 import com.example.newchatapp.R
 import com.example.newchatapp.databinding.FragmentMainPageBinding
@@ -15,6 +16,7 @@ import com.example.newchatapp.model.User
 import com.example.newchatapp.view.adapter.UsersAdapter
 import com.example.newchatapp.viewmodel.UsersViewModel
 import com.example.newchatapp.viewmodel.ViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -44,6 +46,14 @@ class MainPageFragment : Fragment() {
             adapter = UsersAdapter(it)
             adapter?.notifyDataSetChanged()
             binding?.chatList?.adapter = adapter
+        }
+
+        binding?.signOutButton?.setOnClickListener{
+            viewModel.signOut()
+            if(Firebase.auth.currentUser==null)
+                findNavController().navigate(R.id.action_mainPageFragment_to_loginFragment)
+            else
+                Snackbar.make(it,"LogOut error", Snackbar.LENGTH_SHORT).show()
         }
     }
 
