@@ -20,6 +20,14 @@ class ChatFragment : Fragment() {
         return binding?.root
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        val id = ChatFragmentArgs.fromBundle(requireArguments()).receiverID
+        val name = ChatFragmentArgs.fromBundle(requireArguments()).receiverName
+
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         binding = null

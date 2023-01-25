@@ -10,7 +10,7 @@ import com.example.newchatapp.model.User
 
 class UsersAdapter(private val userList:MutableList<User>,private val onUserClickListener: OnUserClickListener):RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
     interface OnUserClickListener{
-        fun onUserClickListener(position: Int)
+        fun onUserClickListener(user:User)
     }
 
 
@@ -23,7 +23,7 @@ class UsersAdapter(private val userList:MutableList<User>,private val onUserClic
                 this.userStatus.text = "online"
             }
             itemView.setOnClickListener {
-                onUserClickListener.onUserClickListener(position =position )
+                onUserClickListener.onUserClickListener(user)
             }
         }
     }

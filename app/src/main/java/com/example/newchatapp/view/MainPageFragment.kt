@@ -62,7 +62,11 @@ class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
         binding = null
     }
 
-    override fun onUserClickListener(position: Int) {
+    override fun onUserClickListener(user:User) {
+        val id = user.userId
+        val name = user.userFirstName
 
+        val action = MainPageFragmentDirections.actionMainPageFragmentToChatFragment(id!!, name!!)
+        findNavController().navigate(action)
     }
 }

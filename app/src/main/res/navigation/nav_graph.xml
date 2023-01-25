@@ -35,5 +35,19 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/mainPageFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainPageFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.newchatapp.view.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="ReceiverID"
+            app:argType="string" />
+        <argument android:name="ReceiverName"
+            app:argType="string" />
     </fragment>
 </navigation>
