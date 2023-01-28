@@ -11,6 +11,7 @@ import com.example.newchatapp.databinding.FragmentChatBinding
 import com.example.newchatapp.model.Message
 import com.example.newchatapp.view.adapter.ChatAdapter
 import com.example.newchatapp.viewmodel.MessagesViewModel
+import com.example.newchatapp.viewmodel.UsersViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -33,8 +34,10 @@ class ChatFragment : Fragment() {
 
         val id = ChatFragmentArgs.fromBundle(requireArguments()).receiverID
         val name = ChatFragmentArgs.fromBundle(requireArguments()).receiverName
+        val senderName = ChatFragmentArgs.fromBundle(requireArguments()).senderName
 
         val messageViewModel = ViewModelProvider(this)[MessagesViewModel::class.java]
+        val usersViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
         messageViewModel.getAllMessages(id,Firebase.auth.currentUser?.uid!!)
 
@@ -46,7 +49,9 @@ class ChatFragment : Fragment() {
         }
 
         binding?.sendMessageButton?.setOnClickListener {
-            messageViewModel.sendMessage(Message(id,
+            messageViewModel.sendMessage(Message(
+                senderName,
+                id,
                 Firebase.auth.currentUser?.uid,
                 binding?.chatMessageEditText?.text.toString(),
                 false,

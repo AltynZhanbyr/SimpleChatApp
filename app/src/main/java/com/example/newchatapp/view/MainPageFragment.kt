@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
@@ -27,6 +28,7 @@ class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
 
     private var binding:FragmentMainPageBinding?= null
     private var adapter:UsersAdapter?=null
+    private var currentUserName:String?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +50,11 @@ class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
             binding?.chatList?.adapter = adapter
         }
 
+        viewModel?.currentUser?.observe(viewLifecycleOwner){
+            if(it!=null)
+                currentUserName = it.userFirstName
+        }
+
         binding?.signOutButton?.setOnClickListener{
             viewModel.signOut()
             if(Firebase.auth.currentUser==null)
@@ -55,6 +62,7 @@ class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
             else
                 Snackbar.make(it,"LogOut error", Snackbar.LENGTH_SHORT).show()
         }
+
     }
 
     override fun onDestroy() {
@@ -66,7 +74,7 @@ class MainPageFragment : Fragment(),UsersAdapter.OnUserClickListener {
         val id = user.userId
         val name = user.userFirstName
 
-        val action = MainPageFragmentDirections.actionMainPageFragmentToChatFragment(id!!, name!!)
+        val action = MainPageFragmentDirections.actionMainPageFragmentToChatFragment(id!!, name!!,currentUserName?:"none")
         findNavController().navigate(action)
     }
 }

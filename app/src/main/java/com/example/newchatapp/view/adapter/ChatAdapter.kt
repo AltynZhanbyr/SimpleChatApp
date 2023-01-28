@@ -15,6 +15,7 @@ class ChatAdapter(private val messages:MutableList<Message>):RecyclerView.Adapte
 
         fun bind(message:Message){
             binding.message.text = message.message
+            binding.messageSender.text = message.name
         }
     }
 

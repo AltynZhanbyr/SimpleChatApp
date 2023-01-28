@@ -1,5 +1,6 @@
 package com.example.newchatapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,12 +17,13 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class UsersViewModel:ViewModel() {
-    private val firebaseAuth: FirebaseAuth
-    private val firebaseDatabase: FirebaseDatabase
-    private val databaseReference:DatabaseReference
+    private val firebaseAuth: FirebaseAuth = Firebase.auth
+    private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val databaseReference:DatabaseReference = firebaseDatabase.getReference(AppKeys.USER_KEY)
 
     var userList = mutableListOf<User>()
     var users = MutableLiveData<MutableList<User>>()
+    var currentUser = MutableLiveData<User>()
 
     var isDataDoNotExists = MutableLiveData(false)
     var isRegistrationComplete = MutableLiveData<Boolean>()
@@ -29,14 +31,10 @@ class UsersViewModel:ViewModel() {
     var isAccountVerified = MutableLiveData<Boolean>()
 
     init{
-        firebaseAuth = Firebase.auth
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReference = firebaseDatabase.getReference(AppKeys.USER_KEY)
-
         getAllUsers()
     }
 
-    fun getAllUsers(){
+    private fun getAllUsers(){
         databaseReference.addValueEventListener(object:ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
                 if(userList.size>0)
@@ -44,6 +42,9 @@ class UsersViewModel:ViewModel() {
                 for(data in p0.children){
                     if(data.getValue(User::class.java)!!.userId!=firebaseAuth.currentUser?.uid)
                         userList.add(data.getValue(User::class.java)!!)
+                    else {
+                        currentUser.postValue(data.getValue(User::class.java)!!)
+                    }
                 }
                 users.postValue(userList)
             }
