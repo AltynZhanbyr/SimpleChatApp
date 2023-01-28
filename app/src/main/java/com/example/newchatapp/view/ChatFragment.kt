@@ -5,12 +5,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import com.example.newchatapp.R
 import com.example.newchatapp.databinding.FragmentChatBinding
+import com.example.newchatapp.model.Message
+import com.example.newchatapp.view.adapter.ChatAdapter
+import com.example.newchatapp.viewmodel.MessagesViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class ChatFragment : Fragment() {
 
     private var binding:FragmentChatBinding?=null
+    private var messages = mutableListOf<Message>()
+    private lateinit var adapter:ChatAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -20,12 +28,32 @@ class ChatFragment : Fragment() {
         return binding?.root
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val id = ChatFragmentArgs.fromBundle(requireArguments()).receiverID
         val name = ChatFragmentArgs.fromBundle(requireArguments()).receiverName
 
+        val messageViewModel = ViewModelProvider(this)[MessagesViewModel::class.java]
+
+        messageViewModel.getAllMessages(id,Firebase.auth.currentUser?.uid!!)
+
+        adapter = ChatAdapter(messages)
+        binding?.chatList?.adapter = adapter
+
+        messageViewModel.mes.observe(viewLifecycleOwner){
+            adapter.addMessage(it)
+        }
+
+        binding?.sendMessageButton?.setOnClickListener {
+            messageViewModel.sendMessage(Message(id,
+                Firebase.auth.currentUser?.uid,
+                binding?.chatMessageEditText?.text.toString(),
+                false,
+                false
+            )
+            )
+        }
     }
 
     override fun onDestroy() {

@@ -45,9 +45,10 @@
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat" >
         <argument
-            android:name="ReceiverID"
+            android:name="receiverID"
             app:argType="string" />
-        <argument android:name="ReceiverName"
+        <argument
+            android:name="receiverName"
             app:argType="string" />
     </fragment>
 </navigation>
